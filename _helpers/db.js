@@ -32,8 +32,13 @@ async function initialize() {
             console.log(`Database "${database}" already exists.`);
         }
     } catch (err) {
-        console.error('Error creating database:', err);
-        throw err;
+        console.error('Error creating database:');
+        console.error(err.message); // Show the detailed error message
+        console.error('\nPossible causes:\n');
+        console.error('- Incorrect credentials in your config.json file');
+        console.error('- PostgreSQL server not running or misconfigured');
+        console.error('Please check your PostgreSQL setup and try again.');
+        process.exit(1);
     } finally {
         await adminClient.end();
     }
