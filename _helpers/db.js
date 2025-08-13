@@ -1,5 +1,5 @@
 const config = require('config.json');
-const mysql = require('mysql2/promise');
+const { Client } = require('pg');
 const { Sequelize } = require('sequelize');
 
 module.exports = db = {};
@@ -7,13 +7,39 @@ module.exports = db = {};
 initialize();
 
 async function initialize() {
-    // create db if it doesn't already exist
     const { host, port, user, password, database } = config.database;
-    const connection = await mysql.createConnection({ host, port, user, password });
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
 
-    // connect to db
-    const sequelize = new Sequelize(database, user, password, { dialect: 'mysql' });
+    // Step 1: Connect to the default 'postgres' database to check/create target DB
+    const adminClient = new Client({
+        host,
+        port,
+        user,
+        password,
+        database: 'postgres', // default DB
+    });
+
+    try {
+        await adminClient.connect();
+
+        // Check if DB exists
+        const res = await adminClient.query(`SELECT 1 FROM pg_database WHERE datname = $1`, [database]);
+
+        if (res.rowCount === 0) {
+            // Database doesn't exist; create it
+            await adminClient.query(`CREATE DATABASE "${database}"`);
+            console.log(`Database "${database}" created.`);
+        } else {
+            console.log(`Database "${database}" already exists.`);
+        }
+    } catch (err) {
+        console.error('Error creating database:', err);
+        throw err;
+    } finally {
+        await adminClient.end();
+    }
+
+    // Step 2: Connect to the actual application DB
+    const sequelize = new Sequelize(database, user, password, { host, port, dialect: 'postgres' });
 
     // init models and add them to the exported db object
     db.Account = require('../accounts/account.model')(sequelize);

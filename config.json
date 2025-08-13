@@ -1,8 +1,8 @@
 ﻿{
     "database": {
         "host": "localhost",
-        "port": 3306,
-        "user": "root",
+        "port": 5432,
+        "user": "your_postgres_user",
         "password": "",
         "database": "node-mysql-signup-verification-api"
     },
