@@ -9,7 +9,7 @@
     },
     "scripts": {
         "start": "node ./server.js",
-        "start:dev": "nodemon ./server.js"
+        "dev": "nodemon ./server.js"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
@@ -20,7 +20,8 @@
         "express": "^4.17.1",
         "joi": "^17.2.1",
         "jsonwebtoken": "^8.5.1",
-        "mysql2": "^2.1.0",
+        "pg": "^8.16.3",
+        "pg-hstore": "^2.3.4",
         "nodemailer": "^6.4.11",
         "rootpath": "^0.1.2",
         "sequelize": "^6.3.4",
